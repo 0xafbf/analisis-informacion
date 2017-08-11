@@ -1,0 +1,30 @@
+<header><name>High speed gear dataset
+			</name><description>Radial vibration measurements taken on 3MW wind turbine pinion gear. For the fault case (case 1) initial vibration readings showed high vibration levels, the machine was stopped after one week and fault on pinion gear found as shown in image below. Two other vibration readings (case 2 and 3) are given from pinion gears of different wind turbines of the same model with no known faults.
+				</description><Meta_file_download_link>http://data-acoustics.com/wp-content/uploads/2014/06/HS_bearing_meta_data.xml
+					</Meta_file_download_link><Measurement_download_link>http://data-acoustics.com/wp-content/uploads/2014/06/hs_gear_1_fault.zip
+									   http://data-acoustics.com/wp-content/uploads/2014/06/hs_gear_2_3_good.zip
+									   	</Measurement_download_link><Publication_link>No publication available
+											</Publication_link><Measured_by>Eric Bechhoefer
+												</Measured_by><Contact_Email>ebechhoefer@gmail.com
+													</Contact_Email><Date>Unknown
+														</Date><License>High speed gear dataset by Eric Bechhoefer is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+															</License><Page_Permalink>http://data-acoustics.com/?p=280
+																</Page_Permalink><body><Nominal_Machine_Health>Case 1: with fault
+																				Case 2/3: in good condition
+																					</Nominal_Machine_Health><Power_rating>3 MW
+																						</Power_rating><Nominal_Speed>1800 rpm
+																							</Nominal_Speed><Number_of_teeth_on_pinion>32
+																								</Number_of_teeth_on_pinion><Measurement_Channels><Channel>1 (gs)
+																											<Sample_rate>97656 Hz
+																															</Sample_rate><Record_length>6 seconds
+																																		</Record_length><Unit>'g'
+																																					</Unit><Axis_measured>Radial
+																																								</Axis_measured><Sensor_type>Acceleromter
+																																											</Sensor_type></Channel><Channel>2 (tach)
+																																														<Sample_rate>8/rev (constant angular sampling)
+																																																		</Sample_rate><Record_length>40 seconds (approximately)
+																																																					</Record_length><Unit>time (s)
+																																																								</Unit></Channel></Measurement_Channels><Image_Attachments><Attachment>1
+																																																											   <Permalink>http://data-acoustics.com/wp-content/uploads/2014/06/pinonGear.jpg
+																																																												   			   </Permalink></Attachment></Image_Attachments></body><Footer>
+																																																													   </Footer></header>
