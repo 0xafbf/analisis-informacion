@@ -1,2 +1,7 @@
 .DS_Store
 .ipynb_checkpoints
+.ipynb_checkpoints
+.ipynb_checkpoints/
+taller1/.ipynb_checkpoints taller2/.ipynb_checkpoints
+taller1/.ipynb_checkpoints/ taller2/.ipynb_checkpoints/
+*-checkpoint.ipynb
