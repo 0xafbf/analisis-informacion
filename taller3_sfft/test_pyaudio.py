@@ -40,7 +40,7 @@ figure_limit = (-35000, 35000)  # i16 min to i16 max
 sound_figure = Figure(plot_width=1024, plot_height=400, y_range=figure_limit)
 sound_figure.line(x="t", y="y", source=sound_data)
 
-fft_figure = Figure(plot_width=1024, plot_height=400, y_range=(0, 80000))
+fft_figure = Figure(plot_width=1024, plot_height=400, y_range=(0, 800000))
 fft_figure.line(x="f", y="fft", source=fft_data)
 
 document = curdoc()
@@ -68,7 +68,48 @@ sample_rate = fs
 timestep = 1 / sample_rate
 PA_FORMAT = pyaudio.paInt16 if wav.dtype == np.int16 else pyaudio.paFloat32
 
-FOURIER_CUTOFF = 3e4  # try 2k to 20k
+FOURIER_CUTOFF = 8e4  # try 2k to 20k
+
+
+def compress_rle(in_bytes, encode_element):
+    count = 0
+    output = bytearray()
+    for b in in_bytes:
+        if count == 255:
+            output.append(encode_element)
+            output.append(255)
+            count = 0
+
+        if b == encode_element:
+            count += 1
+        else:  # if the new element should not be encoded
+            if count > 0:
+                output.append(encode_element)
+                output.append(count)
+                count = 0
+
+            output.append(b)
+
+    if count > 0:
+        output.append(encode_element)
+        output.append(count)
+        count = 0
+    return bytes(output)
+
+
+def uncompress_rle(in_bytes, encode_element):
+    output = bytearray()
+    for idx, b in enumerate(in_bytes):
+        if b is encode_element:
+            continue
+        if idx == 0:
+            output.append(b)
+        elif in_bytes[idx - 1] == encode_element:
+            output.extend([encode_element] * b)
+        else:
+            output.append(b)
+
+    return bytes(output)
 
 
 def callback(in_data, frame_count, time_info, flag):
@@ -82,22 +123,43 @@ def callback(in_data, frame_count, time_info, flag):
         y = data
         t = np.arange(y.size)
 
-        fft = np.fft.rfft(y)
+        fft_temp = np.fft.rfft(y)
 
         # encode
-        
-        fft_abs = np.absolute(fft)
-        fft[fft_abs < FOURIER_CUTOFF] = np.complex(0)
 
-        fft = (fft / 512)
-        fft = fft.view(np.float64).astype(np.uint16)
+        fft_abs = np.absolute(fft_temp)
+        fft_temp[fft_abs < FOURIER_CUTOFF] = np.complex(0)
 
+        fft_temp = fft_temp.view(np.float64)
+
+        fft_temp = fft_temp / 8000
+
+        fft_temp = fft_temp.astype(np.int16)
+
+        bytes_data = fft_temp.tobytes()
+
+        bytes_compressed = compress_rle(bytes_data, 0)
+
+        bytes_uncompressed = uncompress_rle(bytes_compressed, 0)
+
+        len_data = len(bytes_data)
+        len_compressed = len(bytes_compressed)
+        ratio = len_compressed / len_data
+
+        print("len data: {}, Compressed: {},  final size: {}", len_data,
+              len_compressed, ratio)
+
+        fft_temp = np.frombuffer(bytes_uncompressed, np.int16)
+        print("fft_temp shape", fft_temp.shape)
         # decode
+        fft_temp = fft_temp.astype(np.float64)
 
-        fft = fft.astype(np.float64).reshape(-1, 2).view(np.complex128)
-        fft = fft * 512
+        fft_temp = fft_temp * 8000
+        fft_temp = fft_temp.view(np.complex128)
 
-        y = np.fft.irfft(fft, buff_size)
+        fft = fft_temp
+
+        y = np.fft.irfft(fft_temp, buff_size)
         data = y.astype(np.int16, order='C')
 
     else:
@@ -107,13 +169,16 @@ def callback(in_data, frame_count, time_info, flag):
     return (data, pyaudio.paContinue)
 
 
+default_device = pa.get_default_output_device_info()
+
 stream = pa.open(
     format=PA_FORMAT,
     channels=1,
     rate=sample_rate,
     output=use_sound_file,
     input=~use_sound_file,
-    stream_callback=callback)
+    stream_callback=callback,
+    output_device_index=default_device['index'])
 
 stream.start_stream()
 
